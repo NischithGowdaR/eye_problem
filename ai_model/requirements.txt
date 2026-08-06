@@ -1,1 +1,3 @@
-﻿tensorflow\n
+﻿tensorflow
+pillow
+numpy\n
