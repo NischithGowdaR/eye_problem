@@ -1,0 +1,23 @@
+{
+  "name": "eye-disease-detection-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for AI-Based Eye Disease Detection and Eye Care Recommendation System",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ophthalmology",
+    "ai",
+    "eye-disease",
+    "health-tech",
+    "frontend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.2"
+  }
+}

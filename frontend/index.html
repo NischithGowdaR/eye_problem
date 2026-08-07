@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Based Eye Disease Detection & Eye Care Recommendation System</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <!-- Custom CSS Design System -->
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>
+
+  <!-- NAVIGATION BAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid max-w-7xl">
+      <a class="navbar-brand" href="#home" data-navigate="home">
+        <i class="fa fa-eye text-teal"></i>
+        <span>EyeCare<span class="text-gradient">AI</span></span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="#home" data-navigate="home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#upload" data-navigate="upload">Eye Screening</a></li>
+          <li class="nav-item"><a class="nav-link" href="#dashboard" data-navigate="dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="#history" data-navigate="history">Scan History</a></li>
+          <li class="nav-item"><a class="nav-link d-none" id="nav-admin-link" href="#admin" data-navigate="admin">Admin Panel</a></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Theme Toggle -->
+          <button id="theme-toggle-btn" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 38px; height: 38px;" title="Toggle Dark/Light Mode">
+            <i class="fa fa-moon-o"></i>
+          </button>
+
+          <!-- Role Switcher for Testing -->
+          <select id="role-switcher" class="form-select form-select-sm border-secondary text-muted" style="width: 110px;" title="Switch Role for Demo">
+            <option value="user">User Mode</option>
+            <option value="admin">Admin Mode</option>
+          </select>
+
+          <!-- Auth Buttons (Guest) -->
+          <div id="nav-auth-buttons" class="d-flex gap-2">
+            <button class="btn btn-secondary-custom btn-sm" data-bs-toggle="modal" data-bs-target="#authModal">Log In</button>
+            <button class="btn btn-primary-custom btn-sm" data-bs-toggle="modal" data-bs-target="#authModal">Register</button>
+          </div>
+
+          <!-- User Dropdown (Logged In) -->
+          <div id="nav-user-menu" class="dropdown d-none">
+            <button class="btn btn-outline-primary btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <i class="fa fa-user-circle fs-5"></i>
+              <span id="user-display-name">Patient</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+              <li><a class="dropdown-item" href="#profile" data-navigate="profile"><i class="fa fa-id-card-o me-2"></i> Profile & BMI</a></li>
+              <li><a class="dropdown-item" href="#" onclick="BMI.showPopup(); return false;"><i class="fa fa-calculator me-2"></i> Recalculate BMI</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" id="logout-btn" href="#"><i class="fa fa-sign-out me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN APP VIEWS CONTAINER -->
+  <main id="app-container">
+
+    <!-- VIEW 1: LANDING PAGE -->
+    <section id="view-home" class="app-view">
+      <!-- Hero Banner -->
+      <div class="gradient-hero section-padding text-center">
+        <div class="container max-w-5xl">
+          <span class="badge bg-primary-subtle text-teal px-3 py-2 rounded-pill font-weight-600 mb-3 fs-6">
+            <i class="fa fa-bolt me-1"></i> AI-Powered Ophthalmic Preliminary Screening
+          </span>
+          <h1 class="display-4 font-weight-800 mb-3">
+            Early Detection for <span class="text-gradient">Healthier Vision</span> & Brighter Tomorrow
+          </h1>
+          <p class="lead text-muted max-w-2xl mx-auto mb-4">
+            Upload anterior eye or retinal photographs for instant automated AI screening of Cataracts, Glaucoma, Diabetic Retinopathy, AMD, and Conjunctivitis with personalized recommendations.
+          </p>
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <button class="btn btn-primary-custom btn-lg pulse-animation" data-navigate="upload">
+              <i class="fa fa-camera me-2"></i> Start Free Eye Scan Now
+            </button>
+            <a href="#features" class="btn btn-secondary-custom btn-lg">
+              <i class="fa fa-info-circle me-2"></i> Explore Features
+            </a>
+          </div>
+
+          <!-- Hero Graphic -->
+          <div class="mt-5 glass-panel rounded-lg p-4 mx-auto shadow-xl" style="max-width: 780px;">
+            <div class="row align-items-center g-4 text-start">
+              <div class="col-md-6">
+                <h4 class="font-weight-bold mb-2">Independent Dual-Eye Inference</h4>
+                <p class="small text-muted mb-3">Analyzes Left Eye and Right Eye independently with TensorFlow deep convolutional neural networks and Google Gemini health assistance.</p>
+                <div class="d-flex gap-2">
+                  <span class="badge badge-normal"><i class="fa fa-check me-1"></i> 95%+ Accuracy</span>
+                  <span class="badge badge-info"><i class="fa fa-clock-o me-1"></i> Sub-Second Speed</span>
+                </div>
+              </div>
+              <div class="col-md-6 text-center">
+                <div class="p-4 rounded-circle bg-teal-subtle d-inline-block shadow-glow">
+                  <i class="fa fa-eye display-1 text-teal"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Workflow Section -->
+      <div class="section-padding bg-surface">
+        <div class="container">
+          <div class="text-center max-w-2xl mx-auto mb-5">
+            <h2 class="font-weight-800">How The System Works</h2>
+            <p class="text-muted">Simple 3-step pipeline combining computer vision with clinical guidance.</p>
+          </div>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="custom-card text-center h-100">
+                <div class="card-icon-wrapper icon-teal mx-auto"><i class="fa fa-cloud-upload"></i></div>
+                <h5 class="font-weight-bold">1. Image Upload</h5>
+                <p class="small text-muted">Upload Left, Right, or Both eye photos via drag-and-drop dropzones with automatic 224×224 normalization.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card text-center h-100">
+                <div class="card-icon-wrapper icon-indigo mx-auto"><i class="fa fa-microchip"></i></div>
+                <h5 class="font-weight-bold">2. TensorFlow CNN AI Model</h5>
+                <p class="small text-muted">Deep neural network evaluates image features against trained dataset to calculate disease confidence scores.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card text-center h-100">
+                <div class="card-icon-wrapper icon-emerald mx-auto"><i class="fa fa-user-md"></i></div>
+                <h5 class="font-weight-bold">3. Insights & Nearby Care</h5>
+                <p class="small text-muted">View condition analysis, preventative tips, discuss with Gemini AI chatbot, and locate nearby ophthalmologists via Google Maps.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supported Diseases Grid -->
+      <div class="section-padding bg-main">
+        <div class="container">
+          <div class="text-center max-w-2xl mx-auto mb-5">
+            <h2 class="font-weight-800">Supported Eye Conditions</h2>
+            <p class="text-muted">AI preliminary screening recognizes six major ophthalmic conditions.</p>
+          </div>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="custom-card h-100">
+                <span class="badge badge-warning mb-2">Moderate Risk</span>
+                <h5 class="font-weight-bold">Cataract</h5>
+                <p class="small text-muted">Lens clouding that impairs vision, creates glare sensitivity, and dims color brightness.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card h-100">
+                <span class="badge badge-danger mb-2">High Risk</span>
+                <h5 class="font-weight-bold">Glaucoma</h5>
+                <p class="small text-muted">Optic nerve damage associated with elevated intraocular pressure, leading to peripheral vision loss.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card h-100">
+                <span class="badge badge-danger mb-2">High Risk</span>
+                <h5 class="font-weight-bold">Diabetic Retinopathy</h5>
+                <p class="small text-muted">Retinal microvascular damage resulting from systemic hyperglycemia and micro-aneurysms.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card h-100">
+                <span class="badge badge-warning mb-2">Moderate Risk</span>
+                <h5 class="font-weight-bold">AMD (Macular Degeneration)</h5>
+                <p class="small text-muted">Deterioration of central macular vision affecting reading acuity and straight-line perception.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card h-100">
+                <span class="badge badge-info mb-2">Mild / Acute</span>
+                <h5 class="font-weight-bold">Conjunctivitis (Pink Eye)</h5>
+                <p class="small text-muted">Inflammation of the outer ocular membrane causing redness, itchiness, and discharge.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card h-100">
+                <span class="badge badge-normal mb-2">Healthy</span>
+                <h5 class="font-weight-bold">Normal Healthy Eye</h5>
+                <p class="small text-muted">No significant structural anomalies or pathological lesions observed in preliminary screening.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="section-padding bg-surface">
+        <div class="container max-w-4xl">
+          <h2 class="font-weight-800 text-center mb-5">Frequently Asked Questions</h2>
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item border rounded-3 mb-3">
+              <h2 class="accordion-header">
+                <button class="accordion-button font-weight-600" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                  Is this AI prediction a substitute for a doctor's diagnosis?
+                </button>
+              </h2>
+              <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted small">
+                  No. This platform is designed strictly for preliminary screening and educational guidance. It does not replace a clinical examination by an ophthalmologist.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item border rounded-3 mb-3">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed font-weight-600" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                  What image formats are supported?
+                </button>
+              </h2>
+              <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted small">
+                  The system accepts JPG, JPEG, and PNG image files up to 5MB in size.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item border rounded-3 mb-3">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed font-weight-600" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                  How does the doctor recommendation feature work?
+                </button>
+              </h2>
+              <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted small">
+                  When a potential eye condition is detected above confidence thresholds, the system utilizes Google Maps Places API location services to display nearby eye hospitals and specialists.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: UPLOAD & EYE SCREENING -->
+    <section id="view-upload" class="app-view d-none">
+      <div class="section-padding">
+        <div class="container max-w-4xl">
+          <div class="text-center mb-4">
+            <h2 class="font-weight-800">Eye Image Upload & Screening</h2>
+            <p class="text-muted">Select target eye(s) and upload high-quality photographs for AI analysis.</p>
+          </div>
+
+          <!-- Mode Selector -->
+          <div class="d-flex justify-content-center gap-2 mb-4">
+            <button class="btn btn-primary-custom active" data-eye-mode="both">Both Eyes</button>
+            <button class="btn btn-secondary-custom" data-eye-mode="left">Left Eye Only</button>
+            <button class="btn btn-secondary-custom" data-eye-mode="right">Right Eye Only</button>
+          </div>
+
+          <!-- Dropzones Row -->
+          <div class="row g-4 mb-4">
+            <!-- Left Eye Container -->
+            <div class="col-md-6" id="container-left-eye">
+              <div class="custom-card text-center h-100">
+                <h5 class="font-weight-bold mb-3 text-teal"><i class="fa fa-eye me-2"></i> Left Eye Image</h5>
+                
+                <div class="upload-dropzone" id="dropzone-left">
+                  <div id="drop-content-left">
+                    <i class="fa fa-cloud-upload display-4 text-teal mb-3"></i>
+                    <h6>Drag & Drop Left Eye Image</h6>
+                    <p class="small text-muted mb-0">JPG, JPEG, PNG (Max 5MB)</p>
+                  </div>
+                  <div id="preview-left" class="preview-container d-none">
+                    <img id="img-preview-left" src="" alt="Left Eye Preview">
+                    <button class="remove-btn" title="Remove image">&times;</button>
+                  </div>
+                </div>
+                <input type="file" id="file-input-left" class="d-none" accept="image/jpeg,image/png,image/jpg">
+              </div>
+            </div>
+
+            <!-- Right Eye Container -->
+            <div class="col-md-6" id="container-right-eye">
+              <div class="custom-card text-center h-100">
+                <h5 class="font-weight-bold mb-3 text-teal"><i class="fa fa-eye me-2"></i> Right Eye Image</h5>
+                
+                <div class="upload-dropzone" id="dropzone-right">
+                  <div id="drop-content-right">
+                    <i class="fa fa-cloud-upload display-4 text-teal mb-3"></i>
+                    <h6>Drag & Drop Right Eye Image</h6>
+                    <p class="small text-muted mb-0">JPG, JPEG, PNG (Max 5MB)</p>
+                  </div>
+                  <div id="preview-right" class="preview-container d-none">
+                    <img id="img-preview-right" src="" alt="Right Eye Preview">
+                    <button class="remove-btn" title="Remove image">&times;</button>
+                  </div>
+                </div>
+                <input type="file" id="file-input-right" class="d-none" accept="image/jpeg,image/png,image/jpg">
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit CTA -->
+          <div class="text-center mt-4">
+            <button id="start-analysis-btn" class="btn btn-primary-custom btn-lg px-5">
+              <i class="fa fa-play-circle me-2"></i> Start AI Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: LOADING / PROCESSING -->
+    <section id="view-analysis-loading" class="app-view d-none">
+      <div class="section-padding text-center min-vh-75 d-flex align-items-center justify-content-center">
+        <div class="container max-w-lg">
+          <div class="p-5 custom-card shadow-xl">
+            <div class="spinner-border text-teal mb-4" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+            <h3 class="font-weight-bold mb-2">Analyzing Eye Images</h3>
+            <p id="loading-step-text" class="text-muted small mb-4">Initializing TensorFlow CNN Inference model...</p>
+            
+            <div class="progress" style="height: 10px;">
+              <div id="loading-progress-bar" class="progress-bar bg-teal progress-bar-striped progress-bar-animated" style="width: 25%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: PREDICTION RESULTS -->
+    <section id="view-prediction-results" class="app-view d-none">
+      <div class="section-padding">
+        <div class="container max-w-5xl" id="prediction-results-container">
+          <!-- Rendered dynamically by prediction.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: USER DASHBOARD -->
+    <section id="view-dashboard" class="app-view d-none">
+      <div class="section-padding">
+        <div class="container max-w-6xl">
+          <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+              <h2 class="font-weight-800">User Dashboard</h2>
+              <p class="text-muted small mb-0">Overview of scan history, eye status, and physical health tracking.</p>
+            </div>
+            <button class="btn btn-primary-custom btn-sm" data-navigate="upload">
+              <i class="fa fa-plus me-1"></i> New Eye Scan
+            </button>
+          </div>
+
+          <!-- Metric Cards Row -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-3">
+              <div class="custom-card">
+                <div class="card-icon-wrapper icon-teal"><i class="fa fa-eye"></i></div>
+                <div class="h3 font-weight-bold mb-0" id="dash-total-scans">0</div>
+                <div class="text-muted small">Total Eye Scans</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="custom-card">
+                <div class="card-icon-wrapper icon-indigo"><i class="fa fa-calculator"></i></div>
+                <div class="h3 font-weight-bold mb-0"><span class="bmi-display-value">22.5</span></div>
+                <div class="text-muted small">BMI Score <span class="bmi-display-category">Normal</span></div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="custom-card">
+                <div class="card-icon-wrapper icon-emerald"><i class="fa fa-check-circle"></i></div>
+                <div class="h5 font-weight-bold mb-0 text-truncate" id="dash-left-status">Normal</div>
+                <div class="text-muted small">Latest Left Eye</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="custom-card">
+                <div class="card-icon-wrapper icon-amber"><i class="fa fa-clock-o"></i></div>
+                <div class="small font-weight-bold mb-0 text-truncate" id="dash-last-scan">Recent</div>
+                <div class="text-muted small">Last Scan Date</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Charts Row -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-7">
+              <div class="custom-card h-100">
+                <h5 class="font-weight-bold mb-3">Scan History Volume Trend</h5>
+                <canvas id="dash-trend-chart" height="200"></canvas>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="custom-card h-100">
+                <h5 class="font-weight-bold mb-3">Condition Distribution</h5>
+                <canvas id="dash-disease-chart" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity Log -->
+          <div class="custom-card">
+            <h5 class="font-weight-bold mb-3">Recent Scan Records</h5>
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Mode</th>
+                    <th>Left Eye</th>
+                    <th>Right Eye</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-table-body">
+                  <!-- Populated by dashboard.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 6: SCAN HISTORY -->
+    <section id="view-history" class="app-view d-none">
+      <div class="section-padding">
+        <div class="container max-w-6xl">
+          <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div>
+              <h2 class="font-weight-800">Scan History & Reports</h2>
+              <p class="text-muted small mb-0">Search, filter, download, or delete past preliminary screening records.</p>
+            </div>
+          </div>
+
+          <!-- Filters Bar -->
+          <div class="custom-card mb-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-search text-muted"></i></span>
+                  <input type="text" id="history-search-input" class="form-control" placeholder="Search by date or condition name...">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <select id="history-filter-select" class="form-select">
+                  <option value="all">All Records</option>
+                  <option value="abnormal">Abnormal / Condition Detected</option>
+                  <option value="normal">Normal Healthy Scans</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Table -->
+          <div class="custom-card">
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Scan ID</th>
+                    <th>Date & Time</th>
+                    <th>Left Eye</th>
+                    <th>Right Eye</th>
+                    <th>Mode</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="history-table-body">
+                  <!-- Populated by history.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top" id="history-pagination">
+              <!-- Pagination buttons -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 7: USER PROFILE & BMI -->
+    <section id="view-profile" class="app-view d-none">
+      <div class="section-padding">
+        <div class="container max-w-4xl">
+          <h2 class="font-weight-800 mb-4">User Profile & Physical Metrics</h2>
+
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="custom-card mb-4">
+                <h5 class="font-weight-bold mb-3"><i class="fa fa-id-card me-2 text-teal"></i> Personal Details</h5>
+                <form id="profile-form">
+                  <div class="mb-3">
+                    <label class="form-label small font-weight-600">Full Name</label>
+                    <input type="text" id="profile-name" class="form-control" value="Patient Name" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small font-weight-600">Email Address</label>
+                    <input type="email" id="profile-email" class="form-control" value="patient@eyecare.ai" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary-custom btn-sm">Save Profile Updates</button>
+                </form>
+              </div>
+
+              <div class="custom-card">
+                <h5 class="font-weight-bold mb-3"><i class="fa fa-lock me-2 text-indigo"></i> Security</h5>
+                <form id="password-form">
+                  <div class="mb-3">
+                    <label class="form-label small font-weight-600">Current Password</label>
+                    <input type="password" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small font-weight-600">New Password</label>
+                    <input type="password" class="form-control" required>
+                  </div>
+                  <button type="submit" class="btn btn-secondary-custom btn-sm">Change Password</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="custom-card h-100">
+                <h5 class="font-weight-bold mb-3"><i class="fa fa-calculator me-2 text-amber"></i> Current BMI Metric</h5>
+                
+                <div class="p-4 bg-light rounded text-center mb-4">
+                  <div class="display-4 font-weight-800 text-teal mb-1"><span class="bmi-display-value">22.5</span></div>
+                  <div class="mb-2"><span class="bmi-display-category">Normal Weight</span></div>
+                  <p class="small text-muted mb-0 bmi-display-tip">Healthy metabolic status supports stable ocular blood flow.</p>
+                </div>
+
+                <form id="bmi-inline-form">
+                  <div class="row g-2 mb-3">
+                    <div class="col-6">
+                      <label class="form-label small font-weight-600">Height (cm)</label>
+                      <input type="number" name="height" class="form-control" value="170" required>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small font-weight-600">Weight (kg)</label>
+                      <input type="number" name="weight" class="form-control" value="65" required>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-accent btn-sm w-100">Recalculate BMI</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 8: ADMIN DASHBOARD -->
+    <section id="view-admin" class="app-view d-none">
+      <div class="section-padding">
+        <div class="container max-w-6xl">
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <span class="badge bg-danger mb-1">Administrator Control Panel</span>
+              <h2 class="font-weight-800 mb-0">System Analytics & Management</h2>
+            </div>
+          </div>
+
+          <!-- Admin KPI Row -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="custom-card text-center">
+                <div class="h2 font-weight-bold text-teal" id="admin-kpi-users">4</div>
+                <div class="text-muted small">Registered Users</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card text-center">
+                <div class="h2 font-weight-bold text-indigo" id="admin-kpi-scans">17</div>
+                <div class="text-muted small">Total Prediction Runs</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="custom-card text-center">
+                <div class="h2 font-weight-bold text-amber" id="admin-kpi-feedback">2</div>
+                <div class="text-muted small">User Feedback Inquiries</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="custom-card">
+                <h5 class="font-weight-bold mb-3">Global Disease Prevalence</h5>
+                <canvas id="admin-disease-chart" height="220"></canvas>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="custom-card">
+                <h5 class="font-weight-bold mb-3">Weekly System Load</h5>
+                <canvas id="admin-scans-chart" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Management Table -->
+          <div class="custom-card mb-4">
+            <h5 class="font-weight-bold mb-3">User Account Management</h5>
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Scans</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table-body">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Doctor Recommendation Manager -->
+          <div class="custom-card mb-4">
+            <h5 class="font-weight-bold mb-3">Doctor Recommendation Manager</h5>
+            <form id="admin-add-doctor-form" class="row g-3">
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Hospital / Clinic Name" required>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Address & Distance" required>
+              </div>
+              <div class="col-md-4">
+                <button type="submit" class="btn btn-primary-custom w-100">Add Eye Clinic Location</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Feedback Management -->
+          <div class="custom-card">
+            <h5 class="font-weight-bold mb-3">Feedback & Inquiries</h5>
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>User</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-feedback-table-body">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- AUTHENTICATION MODAL -->
+  <div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content custom-card border-0 p-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title font-weight-bold text-teal">Account Access</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Google OAuth Button -->
+          <button id="google-login-btn" class="btn btn-outline-dark w-100 mb-3 py-2 d-flex align-items-center justify-content-center gap-2">
+            <i class="fa fa-google text-danger fs-5"></i>
+            <span>Continue with Google OAuth 2.0</span>
+          </button>
+
+          <div class="text-center text-muted small mb-3">— OR EMAIL LOGIN —</div>
+
+          <!-- Login Form -->
+          <form id="login-form">
+            <div class="mb-3">
+              <label class="form-label small font-weight-600">Email Address</label>
+              <input type="email" id="login-email" class="form-control" value="patient@eyecare.ai" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small font-weight-600">Password</label>
+              <input type="password" id="login-password" class="form-control" value="password123" required>
+            </div>
+            <button type="submit" class="btn btn-primary-custom w-100 py-2 mb-2">Sign In</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BMI POPUP MODAL -->
+  <div class="modal fade" id="bmiModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content custom-card border-0 p-4">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title font-weight-bold text-teal">Physical Health Assessment</h5>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-3">Please input your physical metrics for initial Body Mass Index (BMI) assessment.</p>
+          <form id="bmi-modal-form">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label small font-weight-600">Age</label>
+                <input type="number" name="age" class="form-control" value="28" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small font-weight-600">Gender</label>
+                <select name="gender" class="form-select">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label small font-weight-600">Height (cm)</label>
+                <input type="number" name="height" class="form-control" value="172" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small font-weight-600">Weight (kg)</label>
+                <input type="number" name="weight" class="form-control" value="68" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary-custom w-100 py-2">Calculate & Continue</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING GEMINI AI CHATBOT WIDGET -->
+  <div id="chatbot-trigger-btn" class="chatbot-trigger" title="Ask Gemini AI Assistant">
+    <i class="fa fa-comments"></i>
+  </div>
+
+  <div id="chatbot-window-panel" class="chatbot-window">
+    <div class="chatbot-header">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fa fa-eye fs-5"></i>
+        <div>
+          <h6 class="mb-0 font-weight-bold">Gemini Eye Assistant</h6>
+          <small class="text-white-50" style="font-size: 0.75rem;">AI Educational Guidance</small>
+        </div>
+      </div>
+      <button id="chatbot-close-btn" class="btn-close btn-close-white"></button>
+    </div>
+
+    <!-- Quick Prompt Chips -->
+    <div class="p-2 bg-light border-bottom d-flex gap-1 overflow-auto">
+      <button class="btn btn-sm btn-outline-secondary text-nowrap py-0 px-2" style="font-size: 0.75rem;" data-chat-chip="What is Glaucoma?">Glaucoma?</button>
+      <button class="btn btn-sm btn-outline-secondary text-nowrap py-0 px-2" style="font-size: 0.75rem;" data-chat-chip="How to prevent Cataract?">Cataract tips?</button>
+      <button class="btn btn-sm btn-outline-secondary text-nowrap py-0 px-2" style="font-size: 0.75rem;" data-chat-chip="What is 20-20-20 rule?">20-20-20 rule</button>
+    </div>
+
+    <div id="chatbot-messages-box" class="chatbot-messages">
+      <!-- Chat bubbles -->
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" id="chatbot-input-field" class="form-control form-control-sm" placeholder="Ask about eye health...">
+      <button id="chatbot-send-btn" class="btn btn-primary-custom btn-sm"><i class="fa fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-surface border-top py-4 text-center mt-auto">
+    <div class="container">
+      <p class="small text-muted mb-1">
+        &copy; 2026 AI-Based Eye Disease Detection & Eye Care Recommendation System.
+      </p>
+      <p class="small text-muted mb-0">
+        Strictly for Preliminary Screening & Educational Purposes. Not a Binding Clinical Diagnosis.
+      </p>
+    </div>
+  </footer>
+
+  <!-- JS SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <script src="static/js/app.js"></script>
+  <script src="static/js/auth.js"></script>
+  <script src="static/js/bmi.js"></script>
+  <script src="static/js/upload.js"></script>
+  <script src="static/js/prediction.js"></script>
+  <script src="static/js/chatbot.js"></script>
+  <script src="static/js/dashboard.js"></script>
+  <script src="static/js/history.js"></script>
+  <script src="static/js/pdf.js"></script>
+  <script src="static/js/admin.js"></script>
+
+</body>
+</html>

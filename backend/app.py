@@ -3,20 +3,28 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from werkzeug.utils import secure_filename
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 AI_DIR = BASE_DIR / "ai_model"
+FRONTEND_DIR = BASE_DIR / "frontend"
+
 if str(AI_DIR) not in sys.path:
     sys.path.append(str(AI_DIR))
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=str(FRONTEND_DIR / "templates"),
+    static_folder=str(FRONTEND_DIR / "static")
+)
 
 
 @app.route("/")
 def home():
-    return jsonify({"status": "Backend running", "ai_module": "ready"})
+    if request.headers.get("Accept") == "application/json":
+        return jsonify({"status": "Backend running", "ai_module": "ready"})
+    return render_template("index.html")
 
 
 @app.route("/health")
