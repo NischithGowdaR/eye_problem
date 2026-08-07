@@ -1,6 +1,11 @@
 import os
 from datetime import timedelta
 
+from dotenv import load_dotenv
+
+
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "development-only-change-me")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)

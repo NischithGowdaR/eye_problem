@@ -1,1 +1,3 @@
-﻿flask\n
+flask
+python-dotenv
+pymongo[srv]
